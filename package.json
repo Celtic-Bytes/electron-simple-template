@@ -1,0 +1,31 @@
+{
+  "name": "electron-simple-template",
+  "version": "0.0.1",
+  "description": "Electron simple template",
+  "keywords": [
+    "electron",
+    "typescript",
+    "react",
+    "esbuild",
+    "simple"
+  ],
+  "license": "MIT",
+  "author": "Stephane Adeso",
+  "type": "commonjs",
+  "main": "main.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "electron": "^34.1.1",
+    "esbuild": "0.25.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
