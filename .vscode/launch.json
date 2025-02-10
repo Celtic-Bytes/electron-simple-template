@@ -1,0 +1,57 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Main process only",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+            },
+            "args": ["--remote-debugging-port=9223", "."],
+            "sourceMaps": true,
+            "outputCapture": "std"
+        },
+        {
+            "name": "Renderer process only",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9223,
+            "webRoot": "${workspaceFolder}",
+            "timeout": 60000,
+            "presentation": {
+                "hidden": true
+            }
+        },
+        {
+            "name": "watcher config file",
+            "request": "launch",
+            "runtimeArgs": ["run", "start"],
+            "runtimeExecutable": "npm",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node"
+        },
+        {
+            "name": "clean and esbuild config file",
+            "request": "launch",
+            "runtimeArgs": ["run", "build:dev"],
+            "runtimeExecutable": "npm",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Electron app",
+            "configurations": ["Main process only", "Renderer process only"],
+            "presentation": {
+                "order": 1
+            }
+        }
+    ]
+}

@@ -1,7 +1,26 @@
 {
-  "name": "electron-simple-template",
+  "name": "yourenamehere",
   "version": "0.0.1",
-  "description": "Electron simple template",
+  "description": "Add youre description",
+  "type": "module",
+  "main": "dist/main.cjs",
+  "private": true,
+  "scripts": {
+    "start": "node watcher.mjs",
+    "build:prod": "npm run clean && node esbuild.config.mjs",
+    "build:dev": "npm run clean && node esbuild.config.mjs --dev",
+    "electron": "electron dist/main.cjs",
+    "clean": "node clean.cjs",
+    "lint:check": "eslint src/",
+    "lint:fix": "eslint --fix src/",
+    "format:check": "prettier --check src/",
+    "format:fix": "prettier --write src/",
+    "styles:check": "stylelint **/*.css",
+    "styles:fix": "stylelint --fix **/*.css",
+    "dist:win": "npm run build:prod && electron-builder --win --x64",
+    "dist:mac": "npm run build:prod && electron-builder --mac --arm64",
+    "dist:linux": "npm run build:prod && electron-builder --linux --x64"
+  },
   "keywords": [
     "electron",
     "typescript",
@@ -10,22 +29,40 @@
     "simple"
   ],
   "license": "MIT",
-  "author": "Stephane Adeso",
-  "type": "commonjs",
-  "main": "main.ts",
-  "scripts": {
-    "test": "test"
+  "author": {
+    "name": "youre name",
+    "email": "blabla@mail.com",
+    "url": "http://www.bla.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "http://www.youre-url.com"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsurl.com"
+  },
+  "homepage": "https://yourehomepage.com",
   "devDependencies": {
+    "@eslint/js": "^9.20.0",
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "electron": "^34.1.1",
+    "electron-builder": "^25.1.8",
     "esbuild": "0.25.0",
-    "typescript": "^5.7.3"
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.15.0",
+    "prettier": "3.5.1",
+    "stylelint": "^16.14.1",
+    "stylelint-config-standard": "^37.0.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "yourenamehere": "file:"
   }
 }
