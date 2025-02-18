@@ -35,16 +35,18 @@ const isServe = allowedArgs.serve;
 /** flag --watch */
 const isWatch = allowedArgs.watch;
 
-console.info(
-  `**** Esbuild configuration **** \n Mode: ${isDev ? 'Development' : 'Production'}`
+console.log(
+  `\n\x1b[38;5;208m**** Esbuild: Building... *****\x1b[0m\nMode: ${
+    isDev ? 'Development' : 'Production'
+  }\x1b[0m`
 );
 if (Object.values(allowedArgs).includes(true)) {
-  console.info(' Arguments:');
+  console.log(' Arguments:');
   Object.entries(allowedArgs).forEach(([key, value]) => {
-    if (value) console.info(`     ${key} : ${value}`);
+    if (value) console.log(`     ${key} : ${value}`);
   });
 }
-console.info('*******************************');
+console.log('\x1b[38;5;208m*******************************\n\x1b[0m');
 
 // ************************* END OF CLI ARGUMENTS HANDLING ************************
 
@@ -69,27 +71,30 @@ const commonConfigs = {
   minify: !isDev,
   loader: { '.png': 'file', '.jpg': 'file', '.html': 'copy' },
   define: allowedArgs.size > 0 ? defineWithArgs : define,
+  alias: {
+    '@src/*': './src/*',
+  },
 };
 
 // MAIN
-const main = await buildOrContext({
+const main = buildOrContext({
   ...commonConfigs,
   entryPoints: ['src/electron/main.ts'],
   platform: 'node',
   format: 'cjs',
   outfile: 'dist/main.cjs',
   external: ['electron'],
-}).catch(() => process.exit(1));
+});
 
 // PRELOAD
-const preload = await buildOrContext({
+const preload = buildOrContext({
   ...commonConfigs,
   entryPoints: ['src/electron/preload.ts'],
   platform: 'node',
   format: 'esm',
   outfile: 'dist/preload.mjs',
   external: ['electron'],
-}).catch(() => process.exit(1));
+});
 
 // RENDERER
 const rendererBaseConfig = {
@@ -112,34 +117,41 @@ const renderConfigWithServerEvent = {
 
 const renderConfig = isServe ? renderConfigWithServerEvent : rendererBaseConfig;
 
-const renderer = await buildOrContext(renderConfig).catch((err) => {
-  console.log('err :>> ', err);
-  process.exit(1);
-});
+const renderer = buildOrContext(renderConfig);
 
-// WATCH
-if (isWatch) {
-  await main.watch();
-  await preload.watch();
-  await renderer.watch();
-  console.info('Esbuild watch mode started...');
-}
+// Wait for all builds or contexts for initial building
+Promise.all([main, preload, renderer])
+  .then(async ([mainResult, preloadResult, rendererResult]) => {
+    console.log(
+      '\n\x1b[38;5;208m**** Build completed successfully! ****\x1b[0m'
+    );
 
-// SERVE
-// Since Electron is designed to use the file:// protocol to load renderer files,
-// it's not recomended to use the HTTP server. If you use it, you will probably have problems
-// with the preload. Also the server will only work with renderer sources files.
+    // WATCH MODE HANDLING
+    if (isWatch) {
+      if (mainResult.watch) await mainResult.watch();
+      if (preloadResult.watch) await preloadResult.watch();
+      if (rendererResult.watch) await rendererResult.watch();
+      console.log('\n\x1b[38;5;208mEsbuild watch mode started...\x1b[0m');
+    }
 
-if (isServe) {
-  await renderer
-    .serve({
-      port: 5500,
-      servedir: 'dist',
-    })
-    .then((result) => {
-      console.info('Esbuild server started...');
-      result.hosts.forEach((host) => {
-        console.info(`   url: http://${host}:${result.port} `);
-      });
-    });
-}
+    // SERVE MODE HANDLING
+    if (isServe) {
+      if (rendererResult.serve) {
+        rendererResult
+          .serve({
+            port: 5500,
+            servedir: 'dist',
+          })
+          .then((result) => {
+            console.log('\n\x1b[38;5;208mEsbuild server started...\x1b[0m');
+            result.hosts.forEach((host) => {
+              console.log(`   url: http://${host}:${result.port}`);
+            });
+          });
+      }
+    }
+  })
+  .catch((error) => {
+    console.error('\n\x1b[31m**** Build failed: ****\x1b[0m', error);
+    process.exit(1);
+  });
