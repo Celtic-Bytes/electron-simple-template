@@ -36,14 +36,14 @@ const isServe = allowedArgs.serve;
 const isWatch = allowedArgs.watch;
 
 console.log(
-  `\n\x1b[38;5;208m**** Esbuild: Building... *****\x1b[0m\nMode: ${
+  `\n\x1b[38;5;208m**** Esbuild: Building... *****\nMode: ${
     isDev ? 'Development' : 'Production'
   }\x1b[0m`
 );
 if (Object.values(allowedArgs).includes(true)) {
-  console.log(' Arguments:');
+  console.log('\x1b[38;5;208m Arguments:\x1b[0m');
   Object.entries(allowedArgs).forEach(([key, value]) => {
-    if (value) console.log(`     ${key} : ${value}`);
+    if (value) console.log(`\x1b[38;5;208m     ${key} : ${value}\x1b[0m`);
   });
 }
 console.log('\x1b[38;5;208m*******************************\n\x1b[0m');
