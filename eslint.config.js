@@ -29,7 +29,7 @@ export default [
       'dist/**',
       'release/**',
       '.gitignore',
-      'clean.cjs',
+      'clean.mjs',
       'watcher.mjs',
     ],
   },

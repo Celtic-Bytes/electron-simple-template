@@ -13,7 +13,7 @@
     "build:dev": "npm run clean & node esbuild.config.mjs --dev",
     "watch": "node watcher.mjs",
     "watch:electron": "node watcher.mjs --electron",
-    "clean": "node clean.cjs",
+    "clean": "node clean.mjs",
     "electron": "electron .",
     "electron:debug": "electron . --remote-debugging-port=9223",
     "lint:check": "eslint src/",
