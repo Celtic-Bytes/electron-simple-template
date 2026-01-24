@@ -6,11 +6,11 @@
   "main": "dist/main.cjs",
   "private": true,
   "scripts": {
-    "start:dev": "npm run build:dev & npm run watch:electron",
-    "start:prod": "npm run build:prod & concurrently  \"npm run watch\" \"npm run electron\"",
-    "start:debug": "npm run build:dev & concurrently  \"npm run watch\" \"npm run electron:debug\"",
-    "build:prod": "npm run clean & node esbuild.config.mjs",
-    "build:dev": "npm run clean & node esbuild.config.mjs --dev",
+    "start:dev": "npm run build:dev && npm run watch:electron",
+    "start:prod": "npm run build:prod && concurrently  \"npm run watch\" \"npm run electron\"",
+    "start:debug": "npm run build:dev && concurrently  \"npm run watch\" \"npm run electron:debug\"",
+    "build:prod": "npm run clean && node esbuild.config.mjs",
+    "build:dev": "npm run clean && node esbuild.config.mjs --dev",
     "watch": "node watcher.mjs",
     "watch:electron": "node watcher.mjs --electron",
     "clean": "node clean.mjs",
@@ -22,9 +22,9 @@
     "format:fix": "prettier --write src/",
     "styles:check": "stylelint **/*.css",
     "styles:fix": "stylelint --fix **/*.css",
-    "dist:win": "npm run build:prod & electron-builder --win --x64",
-    "dist:mac": "npm run build:prod & electron-builder --mac --arm64",
-    "dist:linux": "npm run build:prod & electron-builder --linux --x64"
+    "dist:win": "npm run build:prod && electron-builder --win --x64",
+    "dist:mac": "npm run build:prod && electron-builder --mac --arm64",
+    "dist:linux": "npm run build:prod && electron-builder --linux --x64"
   },
   "keywords": [
     "electron",
