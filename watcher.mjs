@@ -4,8 +4,8 @@
  */
 
 import chokidar from 'chokidar';
-import { exec, spawn } from 'node:child_process';
-import os from 'node:os';
+import electronPath from 'electron'; // Importamos la ruta directa al binario
+import { spawn } from 'node:child_process';
 import process from 'node:process';
 
 // *********************** CLI ARGUMENTS HANDLING ******************************
@@ -15,7 +15,6 @@ const allowedArgs = {
 };
 
 /**
- *
  * @type {import( 'child_process').ChildProcess}
  */
 let electronProcess = null;
@@ -25,14 +24,12 @@ function parseArgs() {
     const [key, value] = arg.split('=');
     const keyClean = key.replace('--', '');
     if (Object.keys(allowedArgs).includes(keyClean)) {
-      // Handle flags with or without values
       allowedArgs[keyClean] = value || true;
     }
   });
 }
 parseArgs();
 
-/**  flag --electron */
 const isElectron = allowedArgs.electron;
 
 if (isElectron)
@@ -42,39 +39,32 @@ if (isElectron)
 
 function build() {
   return new Promise((resolve, reject) => {
+    // build usa shell: true porque invoca un comando npm/node global
     spawn('node', ['esbuild.config.mjs', '--dev'], {
-      stdio: 'inherit', // Attach the Electron app's logs to this terminal
-      shell: true, // Use shell to ensure cross-platform compatibility
+      stdio: 'inherit',
+      shell: true,
     })
       .on('close', (code) => {
-        if (code === 0) {
-          resolve(); // Notify that the build is complete
-        } else {
-          console.log(
-            `\x1b[34mBUILD process finished with code \x1b[0m${code}\x1b[0m`
-          );
-          reject(
-            new Error(
-              `\x1b[34mBuild process exited with code \x1b[0m${code}\x1b[0m`
-            )
-          );
+        if (code === 0) resolve();
+        else {
+          console.log(`\x1b[34mBUILD finished with code \x1b[0m${code}\x1b[0m`);
+          reject(new Error(`Build exited with code ${code}`));
         }
       })
-      .on('error', (err) => {
-        console.log(`\x1b[34mBuild process error:\x1b[0m'${err}\x1b[0m`);
-        reject(err);
-      });
+      .on('error', (err) => reject(err));
   });
 }
 
 function electronStart() {
-  // electronProcess = spawn("npm", ["run", "start"], {
-  electronProcess = spawn('electron', ['dist/main.cjs'], {
-    stdio: 'inherit', // Attach the Electron app's logs to this terminal
-    shell: true, // Use shell to ensure cross-platform compatibility
+  // Usamos el path importado y shell: false para tener control total del proceso
+  electronProcess = spawn(electronPath, ['dist/main.cjs'], {
+    stdio: 'inherit',
+    shell: false,
   })
     .on('close', (code) => {
-      if (code !== null) {
+      // Ignoramos el código de salida si fue matado intencionalmente (SIGTERM)
+      if (code !== null && code !== 0 && code !== 143) {
+        // 143 es usualmente SIGTERM
         console.log(
           `\x1b[34mELECTRON process exited with code \x1b[0m${code}\x1b[0m`
         );
@@ -89,31 +79,25 @@ function electronRestart() {
   console.log('\n\x1b[34m*** Restarting Electron***\n\x1b[0m');
 
   if (electronProcess) {
-    electronProcess.kill('SIGTERM');
+    // Al usar shell: false, .kill() mata al proceso Electron real inmediatamente
+    try {
+      // Eliminamos listeners para evitar logs confusos de 'exit code' durante el reinicio
+      electronProcess.removeAllListeners('close');
+      electronProcess.kill();
+      electronProcess = null;
+    } catch (e) {
+      console.error('Error killing electron process:', e);
+    }
   }
 
-  getElectronProcesses()
-    .then((processes) => {
-      processes.forEach((pro) => {
-        try {
-          process.kill(pro.pid);
-        } catch (err) {
-          console.log(
-            `\x1b[31mUnable to kill electron process with pid: ${pro.pid}. Error: \x1b[0m${err}\x1b[0m`
-          );
-        }
-      });
-    })
-    .catch((err) =>
-      console.log(`\x1b[31mError restaring Electron: \x1b[0m${err}\x1b[0m`)
-    )
-    .finally(async () => {
-      electronStart();
-    });
+  // Iniciamos uno nuevo
+  electronStart();
 }
 
 function watch() {
   const folder = './src';
+
+  // Arranque inicial
   if (isElectron) {
     electronStart();
   }
@@ -123,10 +107,15 @@ function watch() {
       awaitWriteFinish: { pollInterval: 100, stabilityThreshold: 2000 },
       ignoreInitial: true,
     })
-    .on('change', async (args, stats) => {
+    .on('change', async (args) => {
       if (args) {
-        await build();
-        if (isElectron) electronRestart();
+        try {
+          // Solo reiniciamos si el build es exitoso
+          await build();
+          if (isElectron) electronRestart();
+        } catch (error) {
+          console.error('Build failed, skipping restart');
+        }
       }
     })
     .on('error', (err) =>
@@ -138,40 +127,6 @@ function watch() {
   );
 }
 
-function getElectronProcesses() {
-  return new Promise((resolve, reject) => {
-    const platform = os.platform();
-
-    // Use platform-appropriate command for process listing
-    const cmd =
-      platform === 'win32'
-        ? 'tasklist' // Windows command
-        : 'ps -A -o pid,comm'; // Linux/macOS command
-
-    exec(cmd, (err, stdout, stderr) => {
-      if (err) {
-        return reject(err);
-      }
-
-      // Parse the output
-      const electronProcesses = stdout
-        .split('\n')
-        .filter((line) => line.toLowerCase().includes('electron')) // Filter for Electron processes
-        .map((line) => {
-          const parts = line.trim().split(/\s+/);
-          if (platform === 'win32') {
-            // On Windows, the first segment is the name and the last is the PID
-            const name = parts[0];
-            const pid = parseInt(parts[1], 10);
-            return { pid, name };
-          } else {
-            throw new Error('Pending to implement for Mac and Linux');
-          }
-        });
-
-      resolve(electronProcesses);
-    });
-  });
-}
+// Ya no necesitamos getElectronProcesses porque gestionamos nuestro propio hijo
 
 watch();
