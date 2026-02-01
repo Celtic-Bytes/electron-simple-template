@@ -35,7 +35,8 @@ You can use them through the CLI.
 2. Clone this repo and `npm install`.
 3. Update the **package.json**, the **electron-builder.json** and other files ( like the contributing, license, etc) with your information. ( if you don´t update the **package.json** you will have problems running the app.)
    - In the **package.json** search for "yourenamehere" and change it for your app name.
-4. (optional) Install vscode plugins [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [Eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint).
+4. Update / modify the **AGENTS.md** to fit your project requirements.
+5. (optional) Install vscode plugins [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [Eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint).
 
 That's All. Now you can start focus on developing your app. Enjoy !
 
