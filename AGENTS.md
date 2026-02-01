@@ -154,6 +154,17 @@ declare global {
 
 ---
 
+## Styles Guidelines
+
+1. **BEM Methodology** — Always use [BEM](https://getbem.com/) (Block Element Modifier) for naming and structuring classes and styles.
+   - **Block**: Standalone entity that is meaningful on its own (e.g., `menu`, `button`)
+   - **Element**: A part of a block that has no standalone meaning and is semantically tied to its block (e.g., `menu__item`, `button__icon`)
+   - **Modifier**: A flag on a block or element. Use them to change appearance or behavior (e.g., `menu--hidden`, `button--primary`)
+2. **Scoped Styles** — Avoid global tag selectors; rely on specific BEM classes to target elements.
+3. **Responsive Design** — Use standard breakpoints and media queries within the component's CSS file.
+
+---
+
 ## Security Guidelines
 
 1. **Context Isolation** — Always enabled (`contextIsolation: true`)
