@@ -162,7 +162,7 @@ declare global {
    - **Modifier**: A flag on a block or element. Use them to change appearance or behavior (e.g., `menu--hidden`, `button--primary`)
 2. **Scoped Styles** — Avoid global tag selectors; rely on specific BEM classes to target elements.
 3. **Responsive Design** — Use standard breakpoints and media queries within the component's CSS file.
-4. **CSS Nesting** — Use native CSS nesting (e.g. `&__element`, `&--modifier`) to reflect the BEM structure properly inside the parent block.
+4. **Native CSS Nesting** — Do **not** use SASS-style selector concatenation (e.g., `&__element`). Native CSS does not support it. Write full class names for BEM elements. Use nesting only for pseudo-classes (e.g., `&:hover`), media queries, or descendants.
 5. **Nesting Limit** — Do not exceed 4 levels of nesting to avoid complexity and maintain readability.
 
 ---
