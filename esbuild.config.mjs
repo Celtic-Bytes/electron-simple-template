@@ -1,9 +1,14 @@
-// https://esbuild.github.io/api/#js-async
-// Electron envs : https://www.electronjs.org/docs/latest/api/environment-variables
-
 /**
- * This Esbuild configuration support watch and serve flags.
- * But due to the nature of Esbuild and Electron, their uses are not recommended.
+ * Esbuild configuration for building the Electron app.
+ *
+ * Produces three bundles:
+ * - main.cjs  (main process, Node.js, CJS)
+ * - preload.cjs (preload script, Node.js, CJS - sandboxed preloads only support CommonJS)
+ * - dist/     (renderer, browser, ESM)
+ *
+ * Supports --dev, --watch, and --serve flags.
+ * See: https://esbuild.github.io/api/
+ * See: https://www.electronjs.org/docs/latest/api/environment-variables
  */
 
 import { build, context } from 'esbuild';
@@ -69,7 +74,14 @@ const commonConfigs = {
   bundle: true,
   sourcemap: isDev ? 'inline' : false,
   minify: !isDev,
-  loader: { '.png': 'file', '.jpg': 'file', '.html': 'copy' },
+  loader: {
+    '.png': 'file',
+    '.jpg': 'file',
+    '.jpeg': 'file',
+    '.gif': 'file',
+    '.svg': 'file',
+    '.html': 'copy',
+  },
   define: allowedArgs.size > 0 ? defineWithArgs : define,
   alias: {
     '@src/*': './src/*',
@@ -91,8 +103,10 @@ const preload = buildOrContext({
   ...commonConfigs,
   entryPoints: ['src/electron/preload.ts'],
   platform: 'node',
-  format: 'esm',
-  outfile: 'dist/preload.mjs',
+  // Sandboxed renderers (production) can only load CommonJS preload scripts;
+  // an ESM preload fails with "Cannot use import statement outside a module".
+  format: 'cjs',
+  outfile: 'dist/preload.cjs',
   external: ['electron'],
 });
 

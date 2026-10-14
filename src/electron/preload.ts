@@ -1,26 +1,30 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type { IpcRendererEvent } from 'electron';
+import type { RendererApi } from '../../types/ipc.types';
 
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args;
-    return ipcRenderer.on(channel, (event, ...args) =>
-      listener(event, ...args)
-    );
-  },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.off(channel, ...omit);
-  },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.send(channel, ...omit);
-  },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.invoke(channel, ...omit);
-  },
+/**
+ * Bridge between the main and renderer processes.
+ *
+ * Exposes a minimal, typed API on `window.api` via contextBridge.
+ * The renderer must only talk to the app through this object — never
+ * through Electron/Node primitives directly.
+ */
+function createSystemApi(): RendererApi['system'] {
+  return {
+    onMainProcessMessage(listener) {
+      const channel = 'main-process-message';
+      const wrapped = (_event: IpcRendererEvent, message: string) =>
+        listener(message);
+      ipcRenderer.on(channel, wrapped);
+      return () => {
+        ipcRenderer.off(channel, wrapped);
+      };
+    },
+  };
+}
 
-  // You can expose other APTs you need here.
-  // ...
-});
+const api: RendererApi = {
+  system: createSystemApi(),
+};
+
+contextBridge.exposeInMainWorld('api', api);

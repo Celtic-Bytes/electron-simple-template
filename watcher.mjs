@@ -1,10 +1,15 @@
-/*
- * This file will watch if any file in the 'src' directory change and will execute automatically
- * the esbuild build in dev mode.
+/**
+ * File watcher for development.
+ *
+ * Watches the src/ directory for changes and triggers an esbuild rebuild.
+ * When the --electron flag is passed, it also restarts the Electron process
+ * automatically after each successful build.
+ *
+ * Usage: node watcher.mjs [--electron]
  */
 
 import chokidar from 'chokidar';
-import electronPath from 'electron'; // Importamos la ruta directa al binario
+import electronPath from 'electron'; // Import the path to the electron binary directly
 import { spawn } from 'node:child_process';
 import process from 'node:process';
 
@@ -39,7 +44,7 @@ if (isElectron)
 
 function build() {
   return new Promise((resolve, reject) => {
-    // build usa shell: true porque invoca un comando npm/node global
+    // build uses shell: true because it invokes a global npm/node command
     spawn('node', ['esbuild.config.mjs', '--dev'], {
       stdio: 'inherit',
       shell: true,
@@ -56,15 +61,15 @@ function build() {
 }
 
 function electronStart() {
-  // Usamos el path importado y shell: false para tener control total del proceso
+  // Use the imported path and shell: false to have full control of the process
   electronProcess = spawn(electronPath, ['dist/main.cjs'], {
     stdio: 'inherit',
     shell: false,
   })
     .on('close', (code) => {
-      // Ignoramos el código de salida si fue matado intencionalmente (SIGTERM)
+      // Ignore the exit code if the process was killed intentionally (SIGTERM)
       if (code !== null && code !== 0 && code !== 143) {
-        // 143 es usualmente SIGTERM
+        // 143 is usually SIGTERM
         console.log(
           `\x1b[34mELECTRON process exited with code \x1b[0m${code}\x1b[0m`
         );
@@ -79,9 +84,9 @@ function electronRestart() {
   console.log('\n\x1b[34m*** Restarting Electron***\n\x1b[0m');
 
   if (electronProcess) {
-    // Al usar shell: false, .kill() mata al proceso Electron real inmediatamente
+    // With shell: false, .kill() kills the real Electron process immediately
     try {
-      // Eliminamos listeners para evitar logs confusos de 'exit code' durante el reinicio
+      // Remove listeners to avoid confusing 'exit code' logs during restart
       electronProcess.removeAllListeners('close');
       electronProcess.kill();
       electronProcess = null;
@@ -90,14 +95,14 @@ function electronRestart() {
     }
   }
 
-  // Iniciamos uno nuevo
+  // Start a new one
   electronStart();
 }
 
 function watch() {
   const folder = './src';
 
-  // Arranque inicial
+  // Initial start
   if (isElectron) {
     electronStart();
   }
@@ -110,11 +115,11 @@ function watch() {
     .on('change', async (args) => {
       if (args) {
         try {
-          // Solo reiniciamos si el build es exitoso
+          // Only restart if the build was successful
           await build();
           if (isElectron) electronRestart();
         } catch (error) {
-          console.error('Build failed, skipping restart');
+          console.error(`Build failed, skipping restart: ${error}`);
         }
       }
     })
@@ -127,6 +132,6 @@ function watch() {
   );
 }
 
-// Ya no necesitamos getElectronProcesses porque gestionamos nuestro propio hijo
+// No need for getElectronProcesses anymore, as we manage our own child process
 
 watch();

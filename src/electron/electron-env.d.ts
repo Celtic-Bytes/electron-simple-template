@@ -1,26 +1,16 @@
-// Example from Vite. Remove when not needed
-// declare namespace NodeJS {
-//   interface ProcessEnv {
-//     /**
-//      * The built directory structure
-//      *
-//      * ```tree
-//      * ├─┬─┬ dist
-//      * │ │ └── index.html
-//      * │ │
-//      * │ ├─┬ dist-electron
-//      * │ │ ├── main.js
-//      * │ │ └── preload.js
-//      * │
-//      * ```
-//      */
-//     APP_ROOT: string
-//     /** /dist/ or /public/ */
-//     VITE_PUBLIC: string
-//   }
-// }
+// Type augmentation for the renderer process.
+// `window.api` is exposed by the preload script (see src/electron/preload.ts).
+import type { RendererApi } from '../../types/ipc.types';
 
-// Used in Renderer process, expose in `preload.ts`
-interface Window {
-  ipcRenderer: import('electron').IpcRenderer;
+declare global {
+  interface Window {
+    /**
+     * Typed API exposed from the Electron preload script.
+     * Use this object for every backend interaction — never access
+     * Electron/Node primitives directly from the renderer.
+     */
+    api: RendererApi;
+  }
 }
+
+export {};

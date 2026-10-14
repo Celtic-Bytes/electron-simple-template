@@ -1,7 +1,5 @@
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
-import pluginImport from 'eslint-plugin-import';
-import pluginReact from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
@@ -17,13 +15,11 @@ export default defineConfig([
     // https://eslint.org/docs/latest/use/configure/configuration-files#excluding-files-with-ignores
     // https://eslint.org/docs/latest/use/configure/ignore
     ignores: ['**/dist/**', '**/release/**', '**/node_modules/**'],
-    plugins: { js, import: pluginImport },
+    plugins: { js },
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      pluginReact.configs.flat.recommended,
-      pluginReact.configs.flat['jsx-runtime'],
+      reactHooks.configs.flat['recommended-latest'],
       eslintConfigPrettier,
     ],
     languageOptions: {
@@ -34,25 +30,9 @@ export default defineConfig([
         tsconfigRootDir: __dirname,
       },
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-      'import/resolver': {
-        typescript: {
-          project: [
-            './tsconfig.json',
-            'packages/*/tsconfig.json',
-            'apps/*/tsconfig.json',
-          ],
-        },
-        node: true,
-      },
-    },
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
-      'import/no-unresolved': 'error',
       'no-unused-vars': ['off'],
       'prefer-const': ['warn'],
     },

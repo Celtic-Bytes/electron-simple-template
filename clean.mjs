@@ -1,4 +1,7 @@
-// This script deletes the specified output folders
+/**
+ * Deletes the specified output folders (dist, release).
+ * Runs automatically before each build via `npm run clean`.
+ */
 
 import fs from 'fs';
 import path from 'path';

@@ -4,11 +4,12 @@
 
 | Technology       | Version | Purpose           |
 | ---------------- | ------- | ----------------- |
-| TypeScript       | 5.9.x   | Primary language  |
-| Electron         | 38.x    | Desktop framework |
+| TypeScript       | 6.0.x   | Primary language  |
+| Electron         | 44.x    | Desktop framework |
 | React            | 19.x    | UI library        |
-| esbuild          | 0.25.x  | Bundler           |
+| esbuild          | 0.28.x  | Bundler           |
 | electron-builder | 26.x    | Distribution      |
+| Vitest           | 5.x     | Test runner       |
 
 ## Project Structure
 
@@ -35,6 +36,8 @@ types/               # Shared TypeScript declarations
 | -------------------- | -------------------------------- |
 | `npm run start:dev`  | Development mode with hot reload |
 | `npm run build:prod` | Production build                 |
+| `npm run test`       | Run all tests (main + renderer)  |
+| `npm run typecheck`  | Type-check without emitting      |
 | `npm run lint:fix`   | Fix linting issues               |
 | `npm run format:fix` | Format code with Prettier        |
 | `npm run dist:linux` | Build Linux distribution         |
@@ -48,6 +51,8 @@ types/               # Shared TypeScript declarations
 ---
 
 ## Commit Guidelines
+
+**Commits are made exclusively by the human developer.** AI agents must never run `git commit` or `git push`. Agents leave changes in the working tree and may only suggest a commit message.
 
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
 
@@ -197,10 +202,15 @@ declare global {
 
 ## Testing Guidelines
 
+- Test runner: **Vitest** with two projects (see `vitest.config.ts`):
+  - `main` — node environment, matches `src/electron/**/*.test.ts`, setup in `src/electron/test/setup.ts`
+  - `renderer` — jsdom environment, matches `src/ui/**/*.test.{ts,tsx}`, setup in `src/ui/test/setup.ts`
 - Place tests adjacent to source files: `Component.test.tsx`
 - Test IPC handlers in isolation
-- Mock Electron APIs in renderer tests
+- Mock Electron APIs in renderer tests (`@testing-library/react` + `@testing-library/user-event` for components). The renderer setup (`src/ui/test/setup.ts`) already mocks `window.api` — extend it there when you add API domains
 - Focus on business logic coverage in main process
+- Static asset imports (`.png`, `.jpg`, `.svg`) are stubbed in tests via the `asset-stub` plugin in `vitest.config.ts`
+- Run `npm run typecheck` after test runs: Vitest and ESLint only transpile, they never type-check
 
 ---
 

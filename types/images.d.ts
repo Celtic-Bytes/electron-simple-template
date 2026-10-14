@@ -13,7 +13,6 @@
  *
  * @see https://www.typescriptlang.org/docs/handbook/modules.html#ambient-modules
  */
-
 declare module '*.png' {
   const value: string;
   export default value;
@@ -30,6 +29,11 @@ declare module '*.jpeg' {
 }
 
 declare module '*.gif' {
+  const value: string;
+  export default value;
+}
+
+declare module '*.svg' {
   const value: string;
   export default value;
 }

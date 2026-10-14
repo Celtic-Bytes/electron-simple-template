@@ -11,6 +11,7 @@ Just download and start developing. Everything is already configured.
 - Easy to maintain.
 - Integrated linter scaffolding.
 - Integrated formater scaffolding.
+- Integrated testing scaffolding (Vitest).
 - Integrated vscode debugger configuration.
 - Typescript ready.
 - React ready.
@@ -25,7 +26,7 @@ So I decided to create my own light, simple and easy to use template. That allow
 
 ## Recommended tools
 
-This template is pre-configured to use Eslint, Prettier and Stylelint.  
+This template is pre-configured to use Eslint, Prettier, Stylelint and Vitest.  
 If you are a vscode user, it is optional but recommended to install those plugins.
 You can use them through the CLI.
 
@@ -52,6 +53,12 @@ That's All. Now you can start focus on developing your app. Enjoy !
 - `clean` - this scripts delete the dist folder. Useful if you want to be sure that no old files still in use after rebuild.
 - `electron` - Only start the electron app. Electron will search for the path in the `main` property in the package.json so you need to have your sources builts or an error will show. You have to use it after `build:prod` or `build:dev`.
 - `electron:debug` - Launch the electron app with a specific port to enable debug in vscode.
+- `test` - Run all the tests once (both main process and renderer projects).
+- `test:watch` - Run the tests in watch mode.
+- `test:main` - Run only the main process tests.
+- `test:renderer` - Run only the renderer tests.
+- `test:coverage` - Run the tests with a coverage report.
+- `typecheck` - Runs the TypeScript compiler (`tsc --noEmit`) to type-check the whole project without emitting files. Vitest and ESLint only transpile and never type-check, so run this to catch TypeScript type errors.
 - `lint:*` - Will run Eslint via the CLI. Check will search for error, and fix will try to automagically fix them.
 - `format:*` - Will run Prettier via the CLI. Check will search for error, and fix will try to automagically fix them.
 - `styles:*` - Will run Stylelint via the CLI. Check will search for error, and fix will try to automagically fix them.

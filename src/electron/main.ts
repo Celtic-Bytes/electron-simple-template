@@ -15,12 +15,12 @@ function createWindow() {
   win = new BrowserWindow({
     icon: path.join(__dirname, url),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
+      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: true,
       // sandbox: true may make youre preload undebuggable or not working properly.
-      // check this ur: https://www.electronjs.org/docs/latest/tutorial/esm#preload-scripts
+      // check this URL: https://www.electronjs.org/docs/latest/tutorial/esm#preload-scripts
       sandbox: !isDev,
     },
   });

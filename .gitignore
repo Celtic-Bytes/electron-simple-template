@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 release
+coverage
 *.local
 
 # Editor directories and files
@@ -23,3 +24,6 @@ release
 *.njsproj
 *.sln
 *.sw?
+
+# brainstorming mockups
+.superpowers/

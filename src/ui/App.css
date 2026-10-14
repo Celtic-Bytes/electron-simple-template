@@ -40,6 +40,40 @@
   padding: 2em;
 }
 
+.card__count {
+  font-size: 2em;
+  margin-bottom: 1em;
+}
+
+.card__controls {
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
+/* The global reset in index.css strips borders, so the button
+   needs its own border and background to read as a control. */
+.card__button {
+  min-width: 3em;
+  min-height: 3em;
+  font-size: 1.5em;
+  line-height: 1;
+  border: 1px solid #888;
+  border-radius: 8px;
+  background-color: #646cff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.card__button:hover {
+  background-color: #535bd2;
+}
+
+.card__button:active {
+  transform: translateY(1px);
+}
+
 .read-the-docs {
   color: #888;
 }
